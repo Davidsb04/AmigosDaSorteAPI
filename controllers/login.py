@@ -1,9 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from data.firebaseConfig import db
 from helpers.passwordUtils import check_password
-from flask_jwt_extended import create_access_token
-from datetime import timedelta
-from flask_jwt_extended import jwt_required
 
 login_bp = Blueprint('login', __name__)  
 
@@ -37,8 +34,11 @@ def login():
             }), 400           
         
         
-        acess_token = create_access_token(identity={'username' : user_data['username']}, expires_delta=timedelta(hours=1))
-        return jsonify(acess_token=acess_token)
+        username = user_data['username']
+        session['username'] = username
+        return jsonify({
+            "message" : "Usuário logado com sucesso."
+        }), 200
         
         
     except Exception as e:
@@ -46,7 +46,20 @@ def login():
             "erro" : str(e) or "Não foi possível efetuar o login"
         }), 500
         
+#Rota para desconectar usuário
+@login_bp.route('/logout', methods=['POST'])
+def logout():
+    session.pop('username', None)
+    return jsonify({
+        "message" : "Usuário desconectado com sucesso."
+    }), 200
+        
 @login_bp.route('/protected', methods=['GET'])
-@jwt_required()
 def protected():
-    return jsonify(message="Este é um endpoint protegido")
+    if 'username' in session:
+        return jsonify({
+            "message" : "Você está logado :)"
+        }), 200
+    return jsonify({
+        "message" : "Efetue o login para acessar."
+    }), 400

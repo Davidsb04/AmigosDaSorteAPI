@@ -1,16 +1,12 @@
 from flask import Flask
-from flask_jwt_extended import JWTManager
-import json
+from flask_session import Session
 
 app = Flask(__name__)
 
 #Configuração da SECRET_KEY do JWT
-with open('config.json') as config_file:
-    config = json.load(config_file)
-    app.config['SECRET_KEY'] = config['SECRET_KEY']
-    app.config['JWT_SECRET_KEY'] = config['SECRET_KEY']
-
-jwt = JWTManager(app)
+app.config['SECRET_KEY'] = '08JhD*4{8gQg£{aiP(a'
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
 
 from controllers.account import account_bp
