@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from data.firebaseConfig import db
 from helpers.passwordUtils import hash_password
+from helpers.userHelper import is_unique_email, is_unique_username
 
 account_bp = Blueprint('account', __name__)
 
@@ -40,6 +41,12 @@ def create_user():
         return jsonify({
             "error": "Todos os campos são obrigatórios"
         }), 404
+        
+    if not is_unique_email(email):
+        return jsonify({"error": "Esse e-mail já está sendo utilizado."}), 400
+    
+    if not is_unique_username(username):
+        return jsonify({"error": "Esse nome de usuário já está sendo utilizado."}), 400    
 
     hashed_password = hash_password(password)
 
@@ -69,6 +76,12 @@ def update_user(user_id):
         return jsonify({
             "error": "Todos os campos são obrigatórios"
         }), 404
+        
+    if not is_unique_email(email):
+        return jsonify({"error": "Esse e-mail já está sendo utilizado."}), 400
+    
+    if not is_unique_username(username):
+        return jsonify({"error": "Esse nome de usuário já está sendo utilizado."}), 400 
 
     hashed_password = hash_password(password)
 
