@@ -1,12 +1,16 @@
 from flask import Flask
 from flask_session import Session
+from helpers.userHelper import load_config
 
 app = Flask(__name__)
 
-#Configuração da SECRET_KEY do JWT
-app.config['SECRET_KEY'] = '08JhD*4{8gQg£{aiP(a'
-app.config['SESSION_TYPE'] = 'filesystem'
+#Configuração da SECRET_KEY do flask_session
+config = load_config()
+
+app.config['SECRET_KEY'] = config['SECRET_KEY']
+app.config['SESSION_TYPE'] = config['SESSION_TYPE']
 Session(app)
+
 
 
 from controllers.account import account_bp
