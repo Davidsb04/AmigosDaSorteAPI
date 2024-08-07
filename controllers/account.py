@@ -99,7 +99,7 @@ def update_user(user_id):
         if doc.exists:
             doc_ref.update(user_data)
             return jsonify({
-                "message": "Usuário atualizado."
+                "message": "Dados do usuário atualizado."
             }), 200
             
         return jsonify({

@@ -1,4 +1,3 @@
-from flask import session
 from data.firebaseConfig import db
 import json
 
