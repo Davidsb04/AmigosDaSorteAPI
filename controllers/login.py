@@ -34,8 +34,8 @@ def login():
             }), 400           
         
         
-        username = user_data['username']
-        session['username'] = username
+        user_id = users[0].id
+        session['user_id'] = user_id
         return jsonify({
             "message" : "Usuário logado com sucesso."
         }), 200
@@ -49,14 +49,18 @@ def login():
 #Rota para desconectar usuário
 @login_bp.route('/logout', methods=['POST'])
 def logout():
-    session.pop('username', None)
+    if 'user_id' in session:    
+        session.pop('user_id', None)
+        return jsonify({
+            "message" : "Usuário desconectado com sucesso."
+        }), 200        
     return jsonify({
-        "message" : "Usuário desconectado com sucesso."
-    }), 200
+            "error" : "Nenhum usuário conectado foi encontrado."
+        }), 400
         
 @login_bp.route('/protected', methods=['GET'])
 def protected():
-    if 'username' in session:
+    if 'user_id' in session:
         return jsonify({
             "message" : "Você está logado :)"
         }), 200
