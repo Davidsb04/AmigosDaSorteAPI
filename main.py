@@ -21,6 +21,9 @@ app.register_blueprint(account_bp, url_prefix='/account')
 from controllers.login import login_bp
 app.register_blueprint(login_bp, url_prefix='/login')
 
+from controllers.group import group_bp
+app.register_blueprint(group_bp, url_prefix='/group')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
