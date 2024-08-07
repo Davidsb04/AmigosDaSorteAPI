@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from data.firebaseConfig import db
 from helpers.passwordUtils import hash_password
-from helpers.userHelper import is_unique_email, is_unique_username
+from helpers.userHelper import is_unique_email, is_unique_username, is_unique_email_update, is_unique_username_update
 
 account_bp = Blueprint('account', __name__)
 
@@ -15,9 +15,7 @@ def get_all_users():
     return jsonify(users_list), 200
 
 # Rota para retornar um usuário
-
-
-@account_bp.route('/users/<user_id>', methods=['GET'])
+@account_bp.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
     doc_ref = db.collection('users').document(user_id)
     doc = doc_ref.get()
@@ -66,46 +64,54 @@ def create_user():
 # Rota para atualizar dados do usuário
 @account_bp.route('/update_user/<user_id>', methods=['PUT'])
 def update_user(user_id):
-    data = request.json
-    name = data.get('name')
-    email = data.get('email')
-    username = data.get('username')
-    password = data.get('password')
+    if 'user_id' in session:
+        data = request.json
+        name = data.get('name')
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
 
-    if not all([name, email, username, password]):
+        
+        if not all([name, email, username, password]):
+            return jsonify({
+                "error": "Todos os campos são obrigatórios"
+            }), 404
+                     
+        current_user_id = session.get('user_id')
+        
+        if email != session.get('email') and not is_unique_email_update(email, current_user_id):
+            return jsonify({"error": "Esse e-mail já está sendo utilizado."}), 400
+        
+        if username != session.get('username') and not is_unique_username_update(username, current_user_id):
+            return jsonify({"error": "Esse nome de usuário já está sendo utilizado."}), 400
+
+        hashed_password = hash_password(password)
+
+        user_data = {
+            "name": name,
+            "email": email,
+            "username": username,
+            "password": hashed_password,
+        }
+
+        doc_ref = db.collection('users').document(user_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            doc_ref.update(user_data)
+            return jsonify({
+                "message": "Usuário atualizado."
+            }), 200
+            
         return jsonify({
-            "error": "Todos os campos são obrigatórios"
+            "erro": "Usuário não encontrado."
         }), 404
         
-    if not is_unique_email(email):
-        return jsonify({"error": "Esse e-mail já está sendo utilizado."}), 400
-    
-    if not is_unique_username(username):
-        return jsonify({"error": "Esse nome de usuário já está sendo utilizado."}), 400 
-
-    hashed_password = hash_password(password)
-
-    user_data = {
-        "name": name,
-        "email": email,
-        "username": username,
-        "password": hashed_password,
-    }
-
-    doc_ref = db.collection('users').document(user_id)
-    doc = doc_ref.get()
-    if doc.exists:
-        doc_ref.update(user_data)
-        return jsonify({
-            "message": "Usuário atualizado."
-        }), 200
     return jsonify({
-        "erro": "Usuário não encontrado."
-    }), 404
-
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 400
 
 # Rota para deletar usuário
-@account_bp.route('/users/<user_id>', methods=['DELETE'])
+@account_bp.route('/delete/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
     doc_ref = db.collection('users').document(user_id)
     doc = doc_ref.get()
