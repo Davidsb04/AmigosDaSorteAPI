@@ -24,6 +24,9 @@ app.register_blueprint(login_bp, url_prefix='/login')
 from controllers.group import group_bp
 app.register_blueprint(group_bp, url_prefix='/group')
 
+from controllers.bet import bet_bp
+app.register_blueprint(bet_bp, url_prefix='/bet')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
