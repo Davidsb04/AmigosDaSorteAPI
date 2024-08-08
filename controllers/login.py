@@ -43,7 +43,7 @@ def login():
         
     except Exception as e:
         return jsonify({
-            "erro" : str(e) or "Não foi possível efetuar o login"
+            "erro" : str(e) or "Não foi possível efetuar o login."
         }), 500
         
 #Rota para desconectar usuário
