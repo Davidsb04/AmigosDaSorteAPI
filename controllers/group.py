@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, session, request
 from data.firebaseConfig import db
-from helpers.passwordUtils import hash_password
+from firebase_admin import firestore
+from helpers.passwordUtils import hash_password, check_password
 from helpers.groupHelper import get_group_for_update
 import datetime
 
@@ -62,12 +63,12 @@ def get_all_groups():
     }), 400
     
 # Rota para retornar um grupo
-@group_bp.route('/group/<group_id>', methods=['GET'])
-def get_group(group_id):
-    doc_ref = db.collection('groups').document(group_id)
-    doc = doc_ref.get()
-    if doc.exists:
-        return jsonify(doc.to_dict()), 200
+@group_bp.route('/group/<group_name>', methods=['GET'])
+def get_group(group_name):
+    docs = db.collection('groups').where('group_name', '==', group_name).stream()
+    docs_list = [doc.to_dict() for doc in docs]
+    if docs_list:
+        return jsonify(docs_list), 200
     return jsonify({
         "error": "Grupo não encontrado."
     }), 404
@@ -116,4 +117,86 @@ def update_group(group_id):
 
     return jsonify({
         "error" : "Nenhum usuário conectado foi encontrado."
+    }), 400
+
+
+#Rota para deletar um grupo
+@group_bp.route('/delete_group/<group_id>', methods=['DELETE'])
+def delete_group(group_id):
+    if 'user_id' in session:
+        doc_ref = db.collection('groups').document(group_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            doc_ref.delete()
+            return jsonify({
+                "message" : "Grupo deletado com sucesso."
+            }), 200
+            
+        return jsonify({
+            "erro" : "Nenhum grupo foi encontrado."
+        }), 400
+        
+    return jsonify({
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 400
+
+
+#Rota para entrar em um grupo
+@group_bp.route('/join_group/<group_id>', methods=['POST'])
+def join_group(group_id):
+    if 'user_id' in session:        
+        data = request.json
+        group_name = data.get('group_name')
+        group_password = data.get('group_password')
+        user_id = session.get('user_id')
+        
+        group_ref = db.collection('groups').document(group_id)
+        group = group_ref.get()             
+        
+        if group.exists:
+            group_data = group.to_dict()
+            
+            if group_name != group_data['group_name']:
+                return jsonify({
+                    "erro" : "Esse grupo não foi encontrado."
+                }), 400
+        
+            if not check_password(group_data['group_password'], group_password):
+                return jsonify({
+                    "erro" : "Senha inválida."
+                }), 400
+            
+            try:
+                group_ref.update({"members" : firestore.ArrayUnion([user_id])})
+                return jsonify({
+                    "message" : "Usuário inserido no grupo."
+                }), 200
+                
+            except Exception as e:
+                return jsonify({
+                    "erro" : str(e) or "Não foi possível ingressar no grupo."
+                }), 500
+        
+        return jsonify({
+                    "erro" : "Esse grupo não foi encontrado."
+                }), 400
+    return jsonify({
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 400
+        
+#Rota para sair do grupo
+@group_bp.route('/leave_group/<group_id>', methods=['PUT'])
+def leave_group(group_id):
+    if 'user_id' in session:
+        group_ref = db.collection('groups').document(group_id)
+        group = group_ref.get()
+        user_id = session.get('user_id')
+        
+        if group.exists:
+            group_ref.update({"members" : firestore.ArrayRemove([user_id])})          
+            return jsonify({
+                "message" : "Usuário removido do grupo."
+            }), 200
+    return jsonify({
+        "erro" : "Nhenhum usuário conectado foi encontrado."
     }), 400
