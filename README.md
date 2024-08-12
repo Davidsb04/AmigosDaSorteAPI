@@ -4,11 +4,7 @@ AmigosDaSorteAPI é uma API desenvolvida em Flask para a criação e gestão de 
 
 ## Visão Geral
 
-Esta API permite a criação e gestão de grupos de apostas entre amigos, incluindo operações relacionadas a usuários, grupos, apostas e verificação de resultados de partidas.
-
-## Autenticação
-
-A API utiliza sessões para autenticação. Cada rota que requer autenticação do usuário verifica a presença de um `user_id` na sessão (Exceto a rota `/create_user`).
+Esta API permite a criação e gestão de grupos de apostas entre amigos, incluindo operações relacionadas a usuários, grupos, apostas e verificação de resultados de partidas (As apostas se baseam apenas no resultado do jogo).
 
 ## Rotas
 
@@ -245,3 +241,42 @@ A API utiliza sessões para autenticação. Cada rota que requer autenticação 
   - `200 Ok`: Retorna os jogos.
   - `401 Unauthorized`: Nenhum usuário conectado foi encontrado.
   - `505 Internal Server Error`: Não foi possível retornar os confrontos.
+
+## Informações Adicionais
+
+### Clonando o Projeto
+
+Siga os passos abaixo para clonar o projeto localmente:
+
+1. **Clone o repositório**:
+
+   ```bash
+   git clone https://github.com/seu-usuario/seu-repositorio.git
+
+2. **Navegue até o diretório do projeto**:
+
+   ```bash
+   cd seu-repositorio
+
+3. **Instale as dependências**:
+
+   ```bash
+   pip install flask firebase-admin argon2-cffi
+
+4. **Configure o mbiente**:
+
+No projeto adicione o arquivo `config.json` com as seguintes informações:
+
+##### Exemplo do Arquivo:
+```json
+{
+  "SECRET_KEY": "suaChaveParaControleDeSessao",
+  "SESSION_TYPE": "tipoDeSessaoUtilizada",
+  "PERMANENT_SESSION_LIFETIME": 600,
+  "API_FOOTBALL_KEY": "ChaveParaAcessoDaAPIFootBall"
+}
+```
+No projeto adicione o arquivo `serviceAccountKey.json` [conforme o vídeo a seguir](https://www.youtube.com/watch?v=VIDEO_ID).
+
+5. **Execute o arquivos `main.py`**:
+
