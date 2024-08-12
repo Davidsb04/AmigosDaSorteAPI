@@ -244,9 +244,9 @@ Esta API permite a criação e gestão de grupos de apostas entre amigos, inclui
 
 ## Informações Adicionais
 
-### Clonando o Projeto
+### Clonando e Executando o Projeto
 
-Siga os passos abaixo para clonar o projeto localmente:
+Siga os passos abaixo para clonar e executar o projeto localmente:
 
 1. **Clone o repositório**:
 
