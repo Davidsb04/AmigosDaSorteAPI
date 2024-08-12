@@ -263,7 +263,7 @@ Siga os passos abaixo para clonar e executar o projeto localmente:
    ```bash
    pip install flask firebase-admin argon2-cffi
 
-4. **Configure o mbiente**:
+4. **Configure o ambiente**:
 
 No projeto adicione o arquivo `config.json` com as seguintes informações:
 
