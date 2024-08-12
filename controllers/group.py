@@ -200,3 +200,30 @@ def leave_group(group_id):
     return jsonify({
         "erro" : "Nhenhum usuário conectado foi encontrado."
     }), 400
+    
+#Rota para retornar últimas apostas do usuário
+@group_bp.route('/user_bets/<group_id>', methods=['GET'])
+def user_bets(group_id):
+    if 'user_id' in session:
+        user_id = session.get('user_id')
+        bets_ref = db.collection('groups').document(group_id).collection('bets').where('user_id', '==', user_id).stream()
+        
+        bets_list = []
+        for bet in bets_ref:
+            bet_data = bet.to_dict()
+            bets_list.append({
+                "match_id" : bet_data.get('match_id'),
+                "bet" : bet_data.get('bet'),
+                "result" : bet_data.get('result')
+            })
+        
+        if bets_list:
+            return jsonify(bets_list), 200
+        
+        return jsonify({
+            "erro" : "Não foi possível retornar nenhuma aposta."
+        }), 400
+    
+    return jsonify({
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 400
