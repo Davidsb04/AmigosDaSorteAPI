@@ -278,5 +278,5 @@ No projeto adicione o arquivo `config.json` com as seguintes informações:
 ```
 No projeto adicione o arquivo `serviceAccountKey.json` [conforme o vídeo a seguir](https://www.youtube.com/watch?v=VIDEO_ID).
 
-5. **Execute o arquivos `main.py`**:
+5. **Execute o arquivos `main.py`**
 
