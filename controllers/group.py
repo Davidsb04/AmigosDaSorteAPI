@@ -18,7 +18,7 @@ def create_group():
         
         if not group_name or not group_password:
             return jsonify({
-                "erro" : "Insira todos os campo"
+                "erro" : "Insira todos os campos."
             }), 400
         
         hashed_password = hash_password(group_password)
@@ -39,16 +39,16 @@ def create_group():
             
             return jsonify({
                 "message" : "Grupo criado com sucesso."
-            }), 200
+            }), 201
         
         except:
             return jsonify({
                 "erro" : "Não foi possível criar o grupo."
-            })
+            }), 500
         
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
     
 #Rota para obter todos os grupos
 @group_bp.route('/groups', methods=['GET'])
@@ -60,18 +60,23 @@ def get_all_groups():
     
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 403
     
 # Rota para retornar um grupo
 @group_bp.route('/group/<group_name>', methods=['GET'])
 def get_group(group_name):
-    docs = db.collection('groups').where('group_name', '==', group_name).stream()
-    docs_list = [doc.to_dict() for doc in docs]
-    if docs_list:
-        return jsonify(docs_list), 200
+    if 'user_id' in session:        
+        docs = db.collection('groups').where('group_name', '==', group_name).stream()
+        docs_list = [doc.to_dict() for doc in docs]
+        if docs_list:
+            return jsonify(docs_list), 200
+        return jsonify({
+            "error": "Grupo não encontrado."
+        }), 404
+    
     return jsonify({
-        "error": "Grupo não encontrado."
-    }), 404
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 401
     
 #Rota para atualizar informações do grupo
 @group_bp.route('/update_group/<group_id>', methods=['PUT'])
@@ -90,7 +95,7 @@ def update_group(group_id):
         atual_group = get_group_for_update(group_id)
         if not atual_group: 
             return jsonify({
-                "erro" : "Grupo não encontrado"
+                "erro" : "Grupo não encontrado."
             }), 404
         
         data_group = atual_group[1]
@@ -117,7 +122,7 @@ def update_group(group_id):
 
     return jsonify({
         "error" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
 
 
 #Rota para deletar um grupo
@@ -130,15 +135,15 @@ def delete_group(group_id):
             doc_ref.delete()
             return jsonify({
                 "message" : "Grupo deletado com sucesso."
-            }), 200
+            }), 204
             
         return jsonify({
             "erro" : "Nenhum grupo foi encontrado."
-        }), 400
+        }), 404
         
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
 
 
 #Rota para entrar em um grupo
@@ -159,12 +164,17 @@ def join_group(group_id):
             if group_name != group_data['group_name']:
                 return jsonify({
                     "erro" : "Esse grupo não foi encontrado."
-                }), 400
+                }), 404
         
             if not check_password(group_data['group_password'], group_password):
                 return jsonify({
                     "erro" : "Senha inválida."
-                }), 400
+                }), 401
+            
+            if user_id in group_data.get('members', []):
+                return jsonify({
+                    "erro" : "Usuário já faz parte do grupo."
+                }), 409
             
             try:
                 group_ref.update({"members" : firestore.ArrayUnion([user_id])})
@@ -179,10 +189,11 @@ def join_group(group_id):
         
         return jsonify({
                     "erro" : "Esse grupo não foi encontrado."
-                }), 400
+                }), 404
+        
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
         
 #Rota para sair do grupo
 @group_bp.route('/leave_group/<group_id>', methods=['PUT'])
@@ -196,10 +207,10 @@ def leave_group(group_id):
             group_ref.update({"members" : firestore.ArrayRemove([user_id])})          
             return jsonify({
                 "message" : "Usuário removido do grupo."
-            }), 200
+            }), 204
     return jsonify({
         "erro" : "Nhenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
     
 #Rota para retornar últimas apostas do usuário
 @group_bp.route('/user_bets/<group_id>', methods=['GET'])
@@ -221,9 +232,9 @@ def user_bets(group_id):
             return jsonify(bets_list), 200
         
         return jsonify({
-            "erro" : "Não foi possível retornar nenhuma aposta."
-        }), 400
+            "erro" : "Nenhuma aposta foi encontrada."
+        }), 404
     
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401

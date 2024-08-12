@@ -24,21 +24,21 @@ def login():
         if not users:
             return jsonify({
                 "erro" : "Usuário não encontrado"
-            }), 400
+            }), 404
         
         user_data = users[0].to_dict()
         
         if not check_password(user_data['password'], password):
             return jsonify({
                 "erro" : "Senha inválida."
-            }), 400           
+            }), 401           
         
         
         user_id = users[0].id
         session['user_id'] = user_id
         return jsonify({
-            "message" : "Usuário logado com sucesso."
-        }), 200
+            "message" : "Usuário conectado com sucesso."
+        }), 201
         
         
     except Exception as e:
@@ -53,17 +53,30 @@ def logout():
         session.pop('user_id', None)
         return jsonify({
             "message" : "Usuário desconectado com sucesso."
-        }), 200        
+        }), 204     
     return jsonify({
             "error" : "Nenhum usuário conectado foi encontrado."
-        }), 400
+        }), 401
         
-@login_bp.route('/protected', methods=['GET'])
-def protected():
+#Rota para retornar usuário conectado
+@login_bp.route('/current_user', methods=['GET'])
+def get_current_user():
     if 'user_id' in session:
+        user_id = session['user_id']
+        user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
+        
+        if user_doc.exists:
+            user_data = user_doc.to_dict()    
+            return jsonify({
+                "email": user_data.get('email'),
+                "username": user_data.get('username')
+            }), 200
+        
         return jsonify({
-            "message" : "Você está logado :)"
-        }), 200
+            "erro": "Usuário não encontrado."
+        }), 404
+    
     return jsonify({
-        "message" : "Efetue o login para acessar."
-    }), 400
+        "erro" : "Nenhum usuário conectado foi encontrado."
+    }), 401

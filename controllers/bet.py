@@ -45,15 +45,15 @@ def place_bet(group_id, match_id):
             bet_ref.set(bet_data)
             return jsonify({
                 "message" : "Aposta registrada com sucesso."
-            }), 200
+            }), 201
         
         return jsonify({
             "erro" : "Usuário não autorizado ou grupo não encontrado."
-        }), 400
+        }), 403
     
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
     
 #Rota para recuperar os próximos confrontros
 @bet_bp.route('/next_round', methods=['GET'])
@@ -100,7 +100,7 @@ def get_next_round():
         
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
     
 #Rota para verificar resultado da aposta
 @bet_bp.route('/check_bet/<group_id>/<match_id>', methods=['POST'])
@@ -113,7 +113,7 @@ def check_bet(group_id, match_id):
         if not bets:
             return jsonify({
                 "erro" : "Aposta não encontrada."
-            }), 400
+            }), 404
         
         bet = bets[0].to_dict()
         
@@ -150,4 +150,4 @@ def check_bet(group_id, match_id):
         
     return jsonify({
         "erro" : "Nenhum usuário conectado foi encontrado."
-    }), 400
+    }), 401
