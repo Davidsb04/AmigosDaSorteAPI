@@ -276,7 +276,7 @@ No projeto adicione o arquivo `config.json` com as seguintes informações:
   "API_FOOTBALL_KEY": "ChaveParaAcessoDaAPIFootBall"
 }
 ```
-No projeto adicione o arquivo `serviceAccountKey.json` [conforme o vídeo a seguir](https://www.youtube.com/watch?v=VIDEO_ID).
+No projeto adicione o arquivo `serviceAccountKey.json` [conforme o vídeo a seguir](https://www.youtube.com/watch?v=X7SqAxZyd_o).
 
 5. **Execute o arquivos `main.py`**
 
