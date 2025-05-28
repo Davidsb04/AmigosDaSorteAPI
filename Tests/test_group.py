@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from app import app  # Verifique se o app está aqui mesmo
+from main import app
+
 
 @pytest.fixture
 def client():
@@ -10,10 +11,11 @@ def client():
             sess['user_id'] = 'user123'
         yield client
 
+
 def test_create_group_success(client):
     with patch('group.db') as mock_db, \
-         patch('group.hash_password', return_value='hashed'):
-        
+            patch('group.hash_password', return_value='hashed'):
+
         mock_add = mock_db.collection.return_value.add
         mock_add.return_value = (None, MagicMock(id='group123'))
 
@@ -25,10 +27,12 @@ def test_create_group_success(client):
         assert response.status_code == 201
         assert b'Grupo criado com sucesso' in response.data
 
+
 def test_create_group_missing_fields(client):
     response = client.post('/create_group', json={})
     assert response.status_code == 400
     assert b'Insira todos os campos' in response.data
+
 
 def test_get_all_groups(client):
     with patch('group.db') as mock_db:
@@ -40,15 +44,18 @@ def test_get_all_groups(client):
         assert response.status_code == 200
         assert b'Test Group' in response.data
 
+
 def test_get_group_found(client):
     with patch('group.db') as mock_db:
         mock_doc = MagicMock()
         mock_doc.to_dict.return_value = {'group_name': 'Test Group'}
-        mock_db.collection.return_value.where.return_value.stream.return_value = [mock_doc]
+        mock_db.collection.return_value.where.return_value.stream.return_value = [
+            mock_doc]
 
         response = client.get('/group/Test Group')
         assert response.status_code == 200
         assert b'Test Group' in response.data
+
 
 def test_get_group_not_found(client):
     with patch('group.db') as mock_db:
