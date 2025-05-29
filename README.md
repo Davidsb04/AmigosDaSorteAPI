@@ -271,12 +271,11 @@ No projeto adicione o arquivo `config.json` com as seguintes informações:
 ```json
 {
   "SECRET_KEY": "suaChaveParaControleDeSessao",
-  "SESSION_TYPE": "tipoDeSessaoUtilizada",
   "PERMANENT_SESSION_LIFETIME": 600,
   "API_FOOTBALL_KEY": "ChaveParaAcessoDaAPIFootBall"
 }
 ```
 No projeto adicione o arquivo `serviceAccountKey.json` [conforme o vídeo a seguir](https://www.youtube.com/watch?v=X7SqAxZyd_o).
 
-5. **Execute o arquivos `main.py`**
+5. **Execute o arquivo `main.py`**
 
