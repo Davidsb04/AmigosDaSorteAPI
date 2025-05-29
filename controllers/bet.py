@@ -24,7 +24,7 @@ def place_bet(group_id, match_id):
 
         if home_score is None or away_score is None:
             return jsonify({
-                "erro": "Placares da partida não inseridos."
+                "error": "Placares da partida não inseridos."
             }), 400
 
         group_ref = db.collection('groups').document(group_id)
@@ -50,11 +50,11 @@ def place_bet(group_id, match_id):
             }), 201
 
         return jsonify({
-            "erro": "Usuário não autorizado ou grupo não encontrado."
+            "error": "Usuário não autorizado ou grupo não encontrado."
         }), 403
 
     return jsonify({
-        "erro": "Nenhum usuário conectado foi encontrado."
+        "error": "Nenhum usuário conectado foi encontrado."
     }), 401
 
 # Rota para recuperar os próximos confrontros
@@ -71,7 +71,7 @@ def get_next_round():
         }
 
         conn.request(
-            "GET", "/fixtures?league=71&season=2024&next=10", headers=headers)
+            "GET", "/fixtures?league=71&season=2025&next=10", headers=headers)
 
         res = conn.getresponse()
         data = res.read()
@@ -100,11 +100,11 @@ def get_next_round():
             return jsonify(filtered_fixtures), 200
 
         return jsonify({
-            "erro": "Não foi possível retornar os confrontos."
+            "error": "Não foi possível retornar os confrontos."
         }), res.status
 
     return jsonify({
-        "erro": "Nenhum usuário conectado foi encontrado."
+        "error": "Nenhum usuário conectado foi encontrado."
     }), 401
 
 # Rota para verificar resultado da aposta
@@ -120,7 +120,7 @@ def check_bet(group_id, match_id):
         bets = list(bet_ref)
         if not bets:
             return jsonify({
-                "erro": "Aposta não encontrada."
+                "error": "Aposta não encontrada."
             }), 404
 
         bet = bets[0].to_dict()
@@ -154,9 +154,9 @@ def check_bet(group_id, match_id):
             }), 200
 
         return jsonify({
-            "erro": "Não foi possível obter o resultado da partida."
+            "error": "Não foi possível obter o resultado da partida."
         }), res.status
 
     return jsonify({
-        "erro": "Nenhum usuário conectado foi encontrado."
+        "error": "Nenhum usuário conectado foi encontrado."
     }), 401

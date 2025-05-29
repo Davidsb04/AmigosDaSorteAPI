@@ -1,25 +1,27 @@
 from data.firebaseConfig import db
+from google.cloud.firestore import FieldFilter
 import json
 import os
 
 
 def is_unique_email(email):
-    email_exists = db.collection('users').where('email', '==', email).stream()
-    if any(email_exists):
-        return False
-    return True
+    email_exists = db.collection('users').where(
+        filter=FieldFilter('email', '==', email)
+    ).stream()
+    return not any(email_exists)
 
 
 def is_unique_username(username):
     username_exists = db.collection('users').where(
-        'username', '==', username).stream()
-    if any(username_exists):
-        return False
-    return True
+        filter=FieldFilter('username', '==', username)
+    ).stream()
+    return not any(username_exists)
 
 
 def is_unique_email_update(email, user_id):
-    users = db.collection('users').where('email', '==', email).stream()
+    users = db.collection('users').where(
+        filter=FieldFilter('email', '==', email)
+    ).stream()
     for user in users:
         if user.id != user_id:
             return False
@@ -27,7 +29,9 @@ def is_unique_email_update(email, user_id):
 
 
 def is_unique_username_update(username, user_id):
-    users = db.collection('users').where('username', '==', username).stream()
+    users = db.collection('users').where(
+        filter=FieldFilter('username', '==', username)
+    ).stream()
     for user in users:
         if user.id != user_id:
             return False
