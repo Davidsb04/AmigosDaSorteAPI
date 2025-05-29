@@ -4,7 +4,7 @@ AmigosDaSorteAPI é uma API desenvolvida em Flask para a criação e gestão de 
 
 ## Visão Geral
 
-Esta API permite a criação e gestão de grupos de apostas entre amigos, incluindo operações relacionadas a usuários, grupos, apostas e verificação de resultados de partidas (As apostas se baseam apenas no resultado do jogo).
+Esta API permite a criação e gestão de grupos de apostas entre amigos, incluindo operações relacionadas a usuários, grupos, apostas e verificação de resultados de partidas (As apostas se baseiam apenas no resultado do jogo).
 
 ## Rotas
 
